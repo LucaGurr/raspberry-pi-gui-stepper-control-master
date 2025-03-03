@@ -1,71 +1,88 @@
 # Raspberry Pi GUI Stepper Motor Control
 
-A PyQt5-based GUI application for controlling stepper motors via a Raspberry Pi Zero.
+A PyQt5-based GUI application for controlling stepper motors via a Raspberry Pi Zero, featuring a modern dark mode interface.
 
 ## Features
 
-- Clean dark mode interface
-- Serial connection to Raspberry Pi Zero
-- Multiple motor control support
+- Modern dark mode interface
+- Serial connection management for Raspberry Pi Zero
+- Multiple stepper motor control support
 - Real-time motor position feedback
-- Dynamic motor control addition
+- Cross-platform support (Windows/Linux)
+- Comprehensive test suite
 
 ## Project Structure
 
 ```
-raspberry-pi-gui
-├── src
-│   ├── app.py               # Entry point of the application
-│   ├── i2c.py               # Logic for controlling stepper motors
-│   ├── gui
-│   │   ├── main_window.py    # Main GUI window definition
-│   │   └── motor_control.py   # Motor control interface
-│   ├── platform
-│   │   ├── __init__.py       # Marks the directory as a Python package
-│   │   ├── base.py           # Base functionality for platform-specific implementations
-│   │   ├── linux.py          # Linux-specific implementations
-│   │   └── windows.py        # Windows-specific implementations
-│   └── utils
-│       └── serial_connection.py # USB serial connection handling
-├── requirements.txt          # Project dependencies
-└── README.md                 # Project documentation
+raspberry-pi-gui-stepper-control/
+├── src/
+│   ├── app.py
+│   ├── gui/
+│   │   └── main_window.py
+│   └── utils/
+│       └── serial_connection.py
+├── tests/
+│   └── test_app.py
+├── requirements.txt
+└── pytest.ini
 ```
 
 ## Requirements
 
-- Raspberry Pi Zero
-- Python 3
+- Python 3.10 or higher
 - PyQt5
+- pyserial
+- Adafruit CircuitPython MotorKit
+- pytest (for testing)
 
-## Setup Instructions
+## Installation
 
-1. **Clone the repository**:
-   ```
-   git clone <repository-url>
-   cd raspberry-pi-gui
-   ```
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/raspberry-pi-gui-stepper-control.git
+cd raspberry-pi-gui-stepper-control
+```
 
-2. **Install dependencies**:
-   Ensure you have Python 3 installed, then run:
-   ```
-   pip install -r requirements.txt
-   ```
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-3. **Connect the Raspberry Pi**:
-   Connect your Raspberry Pi to your computer via USB.
+3. For development/testing, install additional requirements:
+```bash
+pip install pytest pytest-qt pytest-mock pytest-cov
+```
 
-4. **Run the application**:
-   Execute the following command to start the GUI:
-   ```
-   python src/app.py
-   ```
+## Usage
 
-## Usage Guidelines
+Run the application:
+```bash
+python src/app.py
+```
 
-- **Connecting to the Raspberry Pi**: Use the connection options in the main window to establish a link with the Raspberry Pi.
-- **Motor Control**: Navigate to the motor control interface to select motors, specify rotation direction, and set degrees of rotation.
-- **Debug Information**: View real-time debug information in the main window to monitor the status of the connection and motor operations.
+## Development
 
-## Compatibility
+Run tests:
+```bash
+python -m pytest
+```
 
-This project is designed to work on both Windows and Linux platforms. The platform-specific implementations are handled in the `src/platform` directory.
+## Testing
+
+The project uses pytest with pytest-qt for GUI testing. To run tests:
+
+```bash
+python -m pytest -v
+```
+
+## License
+
+None
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
