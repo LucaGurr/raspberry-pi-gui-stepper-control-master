@@ -1,0 +1,5 @@
+PyQt5
+pyserial
+adafruit-circuitpython-motorkit
+adafruit-circuitpython-motor
+platformdirs
