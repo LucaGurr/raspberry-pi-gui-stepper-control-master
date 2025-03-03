@@ -1,6 +1,14 @@
-# Raspberry Pi GUI Project
+# Raspberry Pi GUI Stepper Motor Control
 
-This project provides a graphical user interface (GUI) for controlling stepper motors connected to a Raspberry Pi via USB serial. The application allows users to interface with the motors, view debug information, and manage connections to the Raspberry Pi.
+A PyQt5-based GUI application for controlling stepper motors via a Raspberry Pi Zero.
+
+## Features
+
+- Clean dark mode interface
+- Serial connection to Raspberry Pi Zero
+- Multiple motor control support
+- Real-time motor position feedback
+- Dynamic motor control addition
 
 ## Project Structure
 
@@ -22,6 +30,12 @@ raspberry-pi-gui
 ├── requirements.txt          # Project dependencies
 └── README.md                 # Project documentation
 ```
+
+## Requirements
+
+- Raspberry Pi Zero
+- Python 3
+- PyQt5
 
 ## Setup Instructions
 
@@ -51,13 +65,6 @@ raspberry-pi-gui
 - **Connecting to the Raspberry Pi**: Use the connection options in the main window to establish a link with the Raspberry Pi.
 - **Motor Control**: Navigate to the motor control interface to select motors, specify rotation direction, and set degrees of rotation.
 - **Debug Information**: View real-time debug information in the main window to monitor the status of the connection and motor operations.
-
-## Features
-
-- User-friendly GUI for easy interaction with stepper motors.
-- Real-time debug information display.
-- Ability to control multiple motors grouped by HAT.
-- Local execution on the user's machine with USB serial communication.
 
 ## Compatibility
 
