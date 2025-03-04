@@ -152,7 +152,7 @@ raspberry-pi-gui-stepper-control/
 
 6. Clone and install:
    ```bash
-   git clone https://github.com/yourusername/raspberry-pi-gui-stepper-control.git
+   git clone https://github.com/LucaGurr/raspberry-pi-gui-stepper-control.git
    cd raspberry-pi-gui-stepper-control
    pip install -r requirements.txt
    ```
