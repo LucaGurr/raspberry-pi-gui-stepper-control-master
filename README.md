@@ -8,7 +8,7 @@ A PyQt5-based GUI application for controlling stepper motors via a Raspberry Pi 
 - Serial connection management for Raspberry Pi Zero
 - Multiple stepper motor control support
 - Real-time motor position feedback
-- Cross-platform support (Windows/Linux)
+- Cross-platform support (Windows(COM3)/Linux(/dev/ttyUSB0))
 - Comprehensive test suite
 
 ## Technical Overview
