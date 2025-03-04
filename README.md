@@ -13,23 +13,31 @@ A PyQt5-based GUI application for controlling stepper motors via a Raspberry Pi 
 
 ## Technical Overview
 
-### Architecture
+### Under the Hood
 
-The application follows a modular architecture:
+#### GUI Architecture
+- **Event-Driven Design**: PyQt5 signal/slot mechanism for asynchronous operations
+- **Dark Mode Implementation**: Custom stylesheet system with configurable themes
+- **Widget Hierarchy**:
+  ```
+  MainWindow
+  └── MotorControlWidget (Multiple instances)
+      ├── DirectionSelector (ComboBox)
+      ├── DegreeInput (SpinBox)
+      └── ControlButtons
+  ```
 
-1. **GUI Layer** (`src/gui/`)
-   - `main_window.py`: Primary window implementing dark theme and layout management
-   - `motor_control.py`: Individual motor control widgets with direction and degree inputs
+#### Hardware Communication
+- **Serial Protocol**: 9600 baud, 8-N-1 configuration
+- **Command Buffer**: FIFO queue for motor commands
+- **Error Handling**: Automatic reconnection and command retry
+- **Platform Detection**: Auto-configuration for Windows/Linux
 
-2. **Hardware Communication** (`src/utils/`)
-   - `serial_connection.py`: Handles serial communication with Raspberry Pi
-   - Supports multiple baudrates (default: 9600)
-   - Implements connection pooling and error handling
-
-3. **Platform Abstraction** (`src/platform/`)
-   - `windows.py` & `linux.py`: Platform-specific implementations
-   - Automatic serial port detection
-   - OS-specific optimizations
+#### Motor Control
+- **Stepping Modes**: Full-step (200 steps/rev), Half-step (400 steps/rev)
+- **Position Tracking**: Real-time degree and step counting
+- **Emergency Stop**: Immediate motor halt capability
+- **Power Management**: Auto-shutdown on inactivity
 
 ### Motor Control System
 
@@ -151,6 +159,50 @@ python src/app.py
 
 ## Development
 
+### Testing Framework
+
+The project uses pytest with several specialized fixtures and configurations:
+
+#### Test Structure
+```text
+tests/
+├── conftest.py           # Shared fixtures and configuration
+├── test_app.py          # Core application tests
+├── test_gui/           
+│   ├── test_main_window.py
+│   └── test_widgets.py
+└── test_hardware/
+    ├── test_serial.py
+    └── test_motor.py
+```
+
+#### Test Categories
+1. **Unit Tests**: Individual component testing
+   ```bash
+   python -m pytest tests/test_hardware
+   ```
+
+2. **GUI Tests**: Interface and widget testing
+   ```bash
+   python -m pytest tests/test_gui
+   ```
+
+3. **Integration Tests**: Full system testing
+   ```bash
+   python -m pytest tests/test_app.py
+   ```
+
+#### Mock Testing
+The project includes comprehensive hardware mocking:
+
+```python
+# Example mock usage
+@pytest.fixture
+def mock_motor():
+    with patch('src.hardware.motor.MotorController') as mock:
+        yield mock
+```
+
 ### Running Tests
 ```bash
 # Run all tests
@@ -161,26 +213,64 @@ python -m pytest --cov=src
 
 # Run GUI-specific tests
 python -m pytest -v -m gui
+
+# Run with detailed output
+python -m pytest -v --capture=no
 ```
 
 ### Debug Mode
 Set environment variable for debug output:
 ```bash
-export DEBUG=1  # Linux/Mac
-set DEBUG=1     # Windows
+# Windows
+set DEBUG=1
+
+# Linux/Mac
+export DEBUG=1
+```
+
+### Logging Levels
+```python
+# Available debug levels
+DEBUG_LEVELS = {
+    'OFF': 0,
+    'ERROR': 1,
+    'WARN': 2,
+    'INFO': 3,
+    'DEBUG': 4,
+    'TRACE': 5
+}
 ```
 
 ## Troubleshooting
+
+### Common Issues
 
 1. **Serial Connection Issues**
    - Check USB connection
    - Verify correct port in platform settings
    - Ensure proper permissions on Linux
+   ```bash
+   # Linux permission fix
+   sudo usermod -a -G dialout $USER
+   ```
 
 2. **Motor Control Issues**
    - Verify I2C addresses (0x60 and 0x61)
    - Check power supply connection
    - Verify motor wiring sequence
+   ```bash
+   # I2C address verification
+   i2cdetect -y 1
+   ```
+
+3. **GUI Issues**
+   - Check Qt version compatibility
+   - Verify display settings
+   - Enable debug logging
+   ```bash
+   set DEBUG=4  # Windows
+   export DEBUG=4  # Linux/Mac
+   ```
 
 ## License
 
