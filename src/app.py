@@ -3,6 +3,10 @@ import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from gui.main_window import MainWindow
 
+# Force X11 on Linux
+if sys.platform.startswith('linux'):
+    os.environ["QT_QPA_PLATFORM"] = "xcb"
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 class App:
