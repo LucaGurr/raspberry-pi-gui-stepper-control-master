@@ -1,4 +1,6 @@
-from PyQt5.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QComboBox, QLineEdit, QHBoxLayout, QScrollArea
+from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, 
+                            QPushButton, QComboBox, QLineEdit, QHBoxLayout, 
+                            QScrollArea)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QColor
 from utils.serial_connection import SerialConnection
@@ -15,32 +17,110 @@ class MainWindow(QMainWindow):
 
         self.serial_connection = SerialConnection()
 
-        # Haupt-Widget und Layout erstellen
+        # Create main widget and layout
         central_widget = QWidget()
         layout = QVBoxLayout()
 
-        # Button zum Verbinden mit dem Raspberry Pi Zero
+        # Create connection control group
+        connection_layout = QHBoxLayout()
+        
+        # Button to connect to Raspberry Pi Zero
         self.connect_button = QPushButton("Connect to PI Zero")
         self.connect_button.clicked.connect(self.connect_to_pi)
-        layout.addWidget(self.connect_button)
+        connection_layout.addWidget(self.connect_button)
 
-        # Debug-Informationen
+        # Add test selector dropdown
+        self.test_selector = QComboBox()
+        self.test_selector.addItems([
+            "Hardware Test",
+            "Motor Rotation Test",
+            "Serial Connection Test",
+            "I2C Communication Test"
+        ])
+        self.test_selector.setCurrentText("Hardware Test")  # Set default
+        connection_layout.addWidget(self.test_selector)
+
+        # Add test execution button
+        self.run_test_button = QPushButton("Run Test")
+        self.run_test_button.clicked.connect(self.run_selected_test)
+        connection_layout.addWidget(self.run_test_button)
+
+        layout.addLayout(connection_layout)
+
+        # Debug information
         self.debug_info = QLabel("Debug Information")
         self.debug_info.setAlignment(Qt.AlignTop)
         layout.addWidget(self.debug_info)
 
-        # Motorsteuerung
+        # Rest of the existing initialization...
         self.motor_controls = []
         self.add_motor_control(layout)
 
-        # Button zum Hinzufügen weiterer Motorsteuerungen
         self.add_motor_button = QPushButton("Add Motor Control")
         self.add_motor_button.clicked.connect(lambda: self.add_motor_control(layout))
         layout.addWidget(self.add_motor_button)
 
-        # Layout dem zentralen Widget zuweisen
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
+
+    def run_selected_test(self):
+        """Execute the selected test and display results"""
+        test_name = self.test_selector.currentText()
+        
+        test_results = {
+            "Hardware Test": self.run_hardware_test,
+            "Motor Rotation Test": self.run_motor_rotation_test,
+            "Serial Connection Test": self.run_serial_test,
+            "I2C Communication Test": self.run_i2c_test
+        }
+        
+        if test_name in test_results:
+            result = test_results[test_name]()
+            self.debug_info.setText(f"Test Results: {result}")
+        else:
+            self.debug_info.setText("Invalid test selected")
+
+    def run_hardware_test(self):
+        """Run basic hardware connectivity test"""
+        try:
+            if self.serial_connection.open_connection():
+                return "Hardware connection successful"
+            return "Hardware connection failed"
+        except Exception as e:
+            return f"Hardware test error: {str(e)}"
+
+    def run_motor_rotation_test(self):
+        """Test motor rotation command"""
+        try:
+            if not self.serial_connection.serial:
+                return "Not connected to hardware"
+            cmd = "motor0 rotate cw 10 degrees\n"
+            if self.serial_connection.send_data(cmd):
+                return "Motor rotation command sent successfully"
+            return "Failed to send motor command"
+        except Exception as e:
+            return f"Motor test error: {str(e)}"
+
+    def run_serial_test(self):
+        """Test serial communication"""
+        try:
+            if self.serial_connection.open_connection():
+                self.serial_connection.close_connection()
+                return "Serial connection test passed"
+            return "Serial connection test failed"
+        except Exception as e:
+            return f"Serial test error: {str(e)}"
+
+    def run_i2c_test(self):
+        """Test I2C communication"""
+        try:
+            import smbus
+            bus = smbus.SMBus(1)
+            # Try to detect MotorHAT at default address
+            bus.read_byte(0x60)
+            return "I2C communication successful"
+        except Exception as e:
+            return f"I2C test error: {str(e)}"
 
     def connect_to_pi(self):
         if self.serial_connection.open_connection():
