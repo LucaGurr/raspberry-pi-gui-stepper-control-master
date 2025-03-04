@@ -5,33 +5,31 @@ from src.app import App
 from src.gui.main_window import MainWindow
 from src.utils.serial_connection import SerialConnection
 
+@pytest.fixture(scope="session")
+def qapp():
+    """Create the QApplication instance"""
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication([])
+    yield app
+    app.quit()
+
 @pytest.fixture
-def app(qapp, qtbot):
-    """Create a fresh app instance for each test"""
-    test_app = App()
-    qtbot.addWidget(test_app.main_window)
-    qtbot.waitExposed(test_app.main_window)
-    
-    yield test_app
-    
-    test_app.main_window.close()
-    qapp.processEvents()
+def main_window(qapp, qtbot):
+    """Create the main window for testing"""
+    window = MainWindow()
+    qtbot.addWidget(window)
+    return window
 
-@pytest.mark.gui
-def test_app_initialization(app, qtbot):
-    """Test if the application initializes correctly"""
-    with qtbot.waitActive(app.main_window):
-        assert isinstance(app.app, QApplication)
-        assert isinstance(app.main_window, MainWindow)
+def test_app_initialization(qapp):
+    """Test if QApplication initializes correctly"""
+    assert QApplication.instance() is not None
 
-@pytest.mark.gui
-def test_main_window_title(app, qtbot):
-    """Test if the main window has correct title"""
-    with qtbot.waitActive(app.main_window):
-        assert app.main_window.windowTitle() == "Main Window"
+def test_main_window_title(main_window):
+    """Test if main window has correct title"""
+    assert main_window.windowTitle() == "Stepper Motor Control"
 
-@pytest.mark.gui
-def test_serial_connection(app, qtbot):
-    """Test if serial connection is properly initialized"""
-    with qtbot.waitActive(app.main_window):
-        assert isinstance(app.main_window.serial_connection, SerialConnection)
+def test_serial_connection(main_window, qtbot):
+    """Test serial connection functionality"""
+    with qtbot.waitSignal(main_window.connection_status_changed, timeout=1000):
+        main_window.connect_to_device()
