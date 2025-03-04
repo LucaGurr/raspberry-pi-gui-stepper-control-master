@@ -107,23 +107,111 @@ raspberry-pi-gui-stepper-control/
 
 ## Installation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/raspberry-pi-gui-stepper-control.git
-cd raspberry-pi-gui-stepper-control
-```
+### Raspberry Pi Setup
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+1. Install Raspberry Pi OS:
+   ```bash
+   # Download and flash Raspberry Pi OS Lite to SD card
+   # Using Raspberry Pi Imager: https://www.raspberrypi.com/software/
+   ```
 
-3. For development/testing, install additional requirements:
-```bash
-pip install pytest pytest-qt pytest-mock pytest-cov
-```
+2. Enable required interfaces:
+   ```bash
+   sudo raspi-config
+   # Navigate to:
+   # 1. Interface Options
+   #    → I2C: Enable
+   #    → Serial Port: Enable
+   #    → SSH: Enable (optional, for remote access)
+   ```
 
-## Configuration
+3. Install system dependencies:
+   ```bash
+   sudo apt update
+   sudo apt install -y python3-pip python3-venv i2c-tools
+   sudo apt install -y python3-dev python3-setuptools
+   ```
+
+4. Configure I2C:
+   ```bash
+   # Verify I2C is enabled
+   ls -l /dev/i2c*
+   
+   # Check for connected I2C devices
+   sudo i2cdetect -y 1
+   
+   # Add user to i2c group
+   sudo usermod -aG i2c $USER
+   ```
+
+5. Setup Python virtual environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+6. Clone and install:
+   ```bash
+   git clone https://github.com/yourusername/raspberry-pi-gui-stepper-control.git
+   cd raspberry-pi-gui-stepper-control
+   pip install -r requirements.txt
+   ```
+
+### Hardware Setup
+
+1. Connect MotorHAT boards:
+   ```text
+   Raspberry Pi   MotorHAT #1    MotorHAT #2
+   3.3V      →   VCC (Both)
+   GND       →   GND (Both)
+   SDA       →   SDA (Both)
+   SCL       →   SCL (Both)
+   ```
+
+2. Set board addresses:
+   - MotorHAT #1: Address 0x60 (default)
+   - MotorHAT #2: Address 0x61 (solder bridge A0)
+
+3. Connect motors:
+   ```text
+   MotorHAT #1:
+   - Motor 0: M1/M2 terminals
+   - Motor 1: M3/M4 terminals
+   
+   MotorHAT #2:
+   - Motor 2: M1/M2 terminals
+   - Motor 3: M3/M4 terminals
+   ```
+
+4. Power supply:
+   ```text
+   - Connect 12V power supply to both MotorHAT boards
+   - DO NOT power motors from Raspberry Pi
+   - Ensure common ground between power supply and Pi
+   ```
+
+### Verification
+
+1. Test I2C connection:
+   ```bash
+   # Should show devices at 0x60 and 0x61
+   sudo i2cdetect -y 1
+   ```
+
+2. Test Python environment:
+   ```bash
+   # Activate virtual environment
+   source venv/bin/activate
+   
+   # Test imports
+   python3 -c "from adafruit_motorkit import MotorKit; print('MotorKit OK')"
+   ```
+
+3. Run basic motor test:
+   ```bash
+   # From project directory
+   python3 src/app.py
+   ```
 
 ### Serial Connection
 - Windows: Usually `COM3` (configurable in `platform/windows.py`)
