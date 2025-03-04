@@ -115,7 +115,14 @@ raspberry-pi-gui-stepper-control/
    # Using Raspberry Pi Imager: https://www.raspberrypi.com/software/
    ```
 
-2. Enable required interfaces:
+2. Install I2C tools and dependencies:
+   ```bash
+   sudo apt update
+   sudo apt install -y python3-pip python3-venv i2c-tools
+   sudo apt install -y python3-dev python3-setuptools
+   ```
+
+3. Enable required interfaces:
    ```bash
    sudo raspi-config
    # Navigate to:
@@ -123,25 +130,19 @@ raspberry-pi-gui-stepper-control/
    #    → I2C: Enable
    #    → Serial Port: Enable
    #    → SSH: Enable (optional, for remote access)
+   sudo reboot  # Reboot to apply changes
    ```
 
-3. Install system dependencies:
+4. Configure I2C permissions:
    ```bash
-   sudo apt update
-   sudo apt install -y python3-pip python3-venv i2c-tools
-   sudo apt install -y python3-dev python3-setuptools
-   ```
-
-4. Configure I2C:
-   ```bash
-   # Verify I2C is enabled
-   ls -l /dev/i2c*
-   
-   # Check for connected I2C devices
-   sudo i2cdetect -y 1
-   
    # Add user to i2c group
    sudo usermod -aG i2c $USER
+   
+   # Verify I2C is enabled and accessible
+   ls -l /dev/i2c*
+   
+   # Now we can check for connected I2C devices
+   sudo i2cdetect -y 1
    ```
 
 5. Setup Python virtual environment:
@@ -443,3 +444,4 @@ None
 - PyQt5 for the GUI framework
 - Adafruit for the MotorHAT library
 - Contributors and testers
+````
