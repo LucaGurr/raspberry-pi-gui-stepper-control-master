@@ -114,13 +114,24 @@ class MainWindow(QMainWindow):
     def run_i2c_test(self):
         """Test I2C communication"""
         try:
-            import smbus
-            bus = smbus.SMBus(1)
-            # Try to detect MotorHAT at default address
-            bus.read_byte(0x60)
-            return "I2C communication successful"
-        except Exception as e:
-            return f"I2C test error: {str(e)}"
+            try:
+                from smbus2 import SMBus
+            except ImportError:
+                return "I2C test error: smbus2 not installed. Run 'pip install smbus2'"
+                
+            try:
+                bus = SMBus(1)  # Use I2C bus 1
+                # Try to detect MotorHAT at default address
+                bus.read_byte(0x60)
+                bus.close()  # Clean up
+                return "I2C communication successful"
+            except OSError as e:
+                return f"I2C hardware error: {str(e)}"
+            except Exception as e:
+                return f"I2C test error: {str(e)}"
+        finally:
+            if 'bus' in locals():
+                bus.close()
 
     def connect_to_pi(self):
         if self.serial_connection.open_connection():
