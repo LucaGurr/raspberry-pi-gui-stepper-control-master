@@ -161,79 +161,102 @@ python src/app.py
 
 ### Testing Framework
 
-The project uses pytest with several specialized fixtures and configurations:
+The project uses pytest with several specialized fixtures and mock objects for hardware simulation.
 
 #### Test Structure
 ```text
 tests/
 ├── conftest.py           # Shared fixtures and configuration
 ├── test_app.py          # Core application tests
-├── test_gui/           
-│   ├── test_main_window.py
-│   └── test_widgets.py
-└── test_hardware/
-    ├── test_serial.py
-    └── test_motor.py
+├── mock_hardware.py     # Hardware simulation classes
+└── test_mock_hardware.py # Hardware simulation tests
 ```
 
-#### Test Categories and Markers
-1. **Unit Tests**: Individual component testing
-   ```bash
-   python -m pytest tests/test_hardware
-   ```
-
-2. **GUI Tests**: Interface and widget testing
-   ```bash
-   python -m pytest -v -m gui
-   ```
-
-3. **Hardware Tests**: Physical device interaction
-   ```bash
-   python -m pytest -v -m hardware
-   ```
-
-4. **Mock Tests**: Hardware simulation
-   ```bash
-   python -m pytest -v -k "mock"
-   ```
-
-#### Test Markers
+#### Mock Hardware Components
 ```python
-# Example test markers
-@pytest.mark.gui  # GUI-specific tests
-@pytest.mark.hardware  # Hardware-dependent tests
+# Serial Connection Mock
+class MockSerialConnection:
+    def __init__(self, port='COM3', baudrate=9600):
+        self.is_connected = False
+        self.mock_responses = {
+            'motor0 rotate cw 90 degrees': 'OK',
+            'motor0 rotate ccw 90 degrees': 'OK'
+        }
+
+# I2C Device Mock
+class MockI2CDevice:
+    def __init__(self, address):
+        self.position = 0
+        self.direction = 'cw'
 ```
+
+#### Test Categories
+1. **Hardware Mock Tests** - `test_mock_hardware.py`
+   ```python
+   def test_serial_connection(mock_serial):
+       # Tests basic serial connectivity
+       assert not mock_serial.is_connected
+       mock_serial.connect()
+       assert mock_serial.is_connected
+
+   def test_motor_rotation(mock_serial):
+       # Tests motor rotation commands
+       mock_serial.connect()
+       response = mock_serial.send_command('motor0 rotate cw 90 degrees')
+       assert response == 'OK'
+
+   def test_i2c_device(mock_i2c):
+       # Tests stepper motor positioning
+       initial_position = mock_i2c.position
+       mock_i2c.step(100, 'cw')
+       assert mock_i2c.position == initial_position + 100
+   ```
+
+2. **Basic Application Tests** - `test_app.py`
+   ```python
+   @pytest.mark.gui
+   def test_app_initialization(qapp):
+       # Tests QApplication setup
+       assert QApplication.instance() is not None
+
+   @pytest.mark.hardware
+   def test_serial_connection(main_window, qtbot):
+       # Tests hardware communication (skipped on non-Pi)
+       ...
+   ```
+
+#### Test Results
+When running on a development machine:
+```bash
+$ python -m pytest -v
+============= test session starts =============
+collected 7 items
+
+test_app.py::test_app_initialization PASSED                 [ 14%]
+test_app.py::test_main_window_title ERROR                  [ 28%]
+test_app.py::test_serial_connection SKIPPED                [ 42%]
+test_mock_hardware.py::test_serial_connection PASSED       [ 57%]
+test_mock_hardware.py::test_motor_rotation PASSED          [ 71%]
+test_mock_hardware.py::test_i2c_device PASSED             [ 85%]
+test_mock_hardware.py::test_main_window_with_mocks ERROR  [100%]
+```
+
+- ✅ All hardware mock tests pass
+- ✅ Basic application initialization works
+- ⏭️ Hardware tests automatically skipped
+- ❌ GUI tests require display setup
 
 #### Running Tests
 ```bash
-# Run all tests
-python -m pytest
+# Run only mock hardware tests
+python -m pytest -v -k "mock"
 
-# Run excluding hardware tests (development environment)
-python -m pytest -v -m "not hardware"
+# Run non-GUI tests
+python -m pytest -v -m "not gui"
 
-# Run only GUI tests
-python -m pytest -v -m gui
-
-# Run with coverage
-python -m pytest --cov=src
+# Run with coverage report
+python -m pytest --cov=src tests/
 ```
-
-#### Test Environment Detection
-The test suite automatically detects the running environment and adjusts accordingly:
-- **Windows/Mac**: Skips hardware-dependent tests
-- **Raspberry Pi**: Runs full test suite including hardware tests
-- **CI Environment**: Uses mock hardware for integration tests
-
-#### Expected Test Results
-When running on a development machine (non-Raspberry Pi):
-- ✅ `test_app_initialization` - Basic app setup
-- ✅ `test_mock_hardware` tests - Hardware simulation
-- ❌ `test_serial_connection` - Requires physical hardware
-- ⚠️ `test_main_window_title` - May fail depending on display setup
-
-When running on Raspberry Pi:
-- ✅ All tests should pass when hardware is properly configured
 
 ### Mock Testing
 The project includes comprehensive hardware mocking:

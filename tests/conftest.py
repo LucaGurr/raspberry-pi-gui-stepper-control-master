@@ -19,6 +19,23 @@ def pytest_runtest_setup(item):
     if 'hardware' in item.keywords and platform.system() != 'Linux':
         pytest.skip('Hardware tests can only run on Raspberry Pi')
 
+@pytest.fixture(scope="session")
+def qapp():
+    """Create the QApplication instance"""
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication([])
+    yield app
+    app.quit()
+
+@pytest.fixture
+def qtbot_instance(qapp, pytestconfig):
+    """Create QtBot instance with proper request object"""
+    from pytestqt.qtbot import QtBot
+    result = QtBot(qapp)
+    result._request = pytestconfig
+    return result
+
 @pytest.fixture(scope="session", autouse=True)
 def qapp_auto():
     """Ensure QApplication exists and is properly torn down"""
@@ -27,6 +44,11 @@ def qapp_auto():
         app = QApplication([])
     yield app
     app.quit()
+
+@pytest.fixture
+def qtbot_fix(qtbot, qapp):
+    """Fixed qtbot fixture that works with QApplication"""
+    return qtbot
 
 @pytest.fixture
 def qtbot(qapp_auto, request):

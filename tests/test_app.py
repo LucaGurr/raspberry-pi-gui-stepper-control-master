@@ -1,6 +1,5 @@
 import pytest
 from PyQt5.QtWidgets import QApplication
-from src.app import App
 from src.gui.main_window import MainWindow
 
 @pytest.fixture(scope="module")
@@ -12,10 +11,10 @@ def qapp():
     return app
 
 @pytest.fixture
-def main_window(qapp, qtbot):
+def main_window(qapp, qtbot_instance):
     """Create the main window for testing"""
     window = MainWindow()
-    qtbot.add_widget(window)  # Changed from addWidget to add_widget
+    qtbot_instance.add_widget(window)
     return window
 
 def test_app_initialization(qapp):
@@ -25,7 +24,7 @@ def test_app_initialization(qapp):
 @pytest.mark.gui
 def test_main_window_title(main_window):
     """Test if main window has correct title"""
-    assert main_window.windowTitle() == "Main Window"  # Changed from "Stepper Motor Control"
+    assert main_window.windowTitle() == "Stepper Motor Control"
 
 @pytest.mark.hardware
 def test_serial_connection(main_window, qtbot):

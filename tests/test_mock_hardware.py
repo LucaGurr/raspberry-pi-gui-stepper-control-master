@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
+from PyQt5.QtWidgets import QApplication
 
 # Mock Adafruit dependencies before importing our modules
 adafruit_mock = MagicMock()
@@ -30,11 +31,21 @@ def mock_i2c():
     return MockI2CDevice(address=0x60)
 
 @pytest.fixture
-def main_window(qapp, mock_serial, mock_i2c, qtbot):
+def main_window(qapp, qtbot_instance, mock_serial, mock_i2c):
     with patch('src.utils.serial_connection.SerialConnection', return_value=mock_serial):
-        window = MainWindow()
-        qtbot.add_widget(window)
-        return window
+        with patch('src.i2c.I2CDevice', return_value=mock_i2c):
+            window = MainWindow()
+            qtbot_instance.add_widget(window)
+            return window
+
+@pytest.fixture
+def main_window_mock(qapp, qtbot_fix, mock_serial, mock_i2c):
+    """Create main window with mocked hardware"""
+    with patch('src.utils.serial_connection.SerialConnection', return_value=mock_serial):
+        with patch('src.hardware.i2c.I2CDevice', return_value=mock_i2c):
+            window = MainWindow()
+            qtbot_fix.addWidget(window)
+            return window
 
 def test_serial_connection(mock_serial):
     assert not mock_serial.is_connected
@@ -60,6 +71,10 @@ def test_i2c_device(mock_i2c):
     assert mock_i2c.position == initial_position + 50
 
 @pytest.mark.gui
-def test_main_window_with_mocks(main_window, qtbot):
+def test_main_window_with_mocks(main_window, qtbot_instance):
     assert main_window.windowTitle() == "Stepper Motor Control"
-    qtbot.waitExposed(main_window)
+    qtbot_instance.waitExposed(main_window)
+
+def test_main_window_with_mocks(main_window_mock):
+    """Test main window with mocked hardware"""
+    assert main_window_mock.windowTitle() == "Stepper Motor Control"
