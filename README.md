@@ -176,7 +176,7 @@ tests/
     └── test_motor.py
 ```
 
-#### Test Categories
+#### Test Categories and Markers
 1. **Unit Tests**: Individual component testing
    ```bash
    python -m pytest tests/test_hardware
@@ -184,15 +184,58 @@ tests/
 
 2. **GUI Tests**: Interface and widget testing
    ```bash
-   python -m pytest tests/test_gui
+   python -m pytest -v -m gui
    ```
 
-3. **Integration Tests**: Full system testing
+3. **Hardware Tests**: Physical device interaction
    ```bash
-   python -m pytest tests/test_app.py
+   python -m pytest -v -m hardware
    ```
 
-#### Mock Testing
+4. **Mock Tests**: Hardware simulation
+   ```bash
+   python -m pytest -v -k "mock"
+   ```
+
+#### Test Markers
+```python
+# Example test markers
+@pytest.mark.gui  # GUI-specific tests
+@pytest.mark.hardware  # Hardware-dependent tests
+```
+
+#### Running Tests
+```bash
+# Run all tests
+python -m pytest
+
+# Run excluding hardware tests (development environment)
+python -m pytest -v -m "not hardware"
+
+# Run only GUI tests
+python -m pytest -v -m gui
+
+# Run with coverage
+python -m pytest --cov=src
+```
+
+#### Test Environment Detection
+The test suite automatically detects the running environment and adjusts accordingly:
+- **Windows/Mac**: Skips hardware-dependent tests
+- **Raspberry Pi**: Runs full test suite including hardware tests
+- **CI Environment**: Uses mock hardware for integration tests
+
+#### Expected Test Results
+When running on a development machine (non-Raspberry Pi):
+- ✅ `test_app_initialization` - Basic app setup
+- ✅ `test_mock_hardware` tests - Hardware simulation
+- ❌ `test_serial_connection` - Requires physical hardware
+- ⚠️ `test_main_window_title` - May fail depending on display setup
+
+When running on Raspberry Pi:
+- ✅ All tests should pass when hardware is properly configured
+
+### Mock Testing
 The project includes comprehensive hardware mocking:
 
 ```python

@@ -1,6 +1,7 @@
 import os
 import sys
 import pytest
+import platform
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
 
@@ -12,6 +13,11 @@ def pytest_configure(config):
     """Configure pytest with GUI marker"""
     QApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
     config.addinivalue_line("markers", "gui: mark test as GUI test")
+
+def pytest_runtest_setup(item):
+    """Skip hardware tests when not on Raspberry Pi"""
+    if 'hardware' in item.keywords and platform.system() != 'Linux':
+        pytest.skip('Hardware tests can only run on Raspberry Pi')
 
 @pytest.fixture(scope="session", autouse=True)
 def qapp_auto():

@@ -1,16 +1,36 @@
-# GUI and Core Dependencies
-PyQt5>=5.15.11
-pyserial>=3.5
-adafruit-circuitpython-motorkit>=1.6.3
-adafruit-circuitpython-motor>=3.4.10
-platformdirs>=4.2.0
+# GUI Dependencies
+PyQt5>=5.15.0
+PyQt5-Qt5>=5.15.0
+PyQt5-sip>=12.13.0
+
+# Hardware Communication
+pyserial~=3.5
+adafruit-blinka>=8.0.0
+adafruit-circuitpython-motorkit>=1.6.0
+adafruit-circuitpython-motor>=3.4.0
+adafruit-platformdetect>=3.77.0
+platformdirs>=4.0.0
 
 # Testing Dependencies
 pytest>=8.0.0
-pytest-qt>=4.4.0
+pytest-qt>=4.0.0
 pytest-mock>=3.14.0
-pytest-cov>=4.1.0
+pytest-cov>=4.0.0
+pytest-xvfb>=3.0.0  # For headless GUI testing
+pytest-timeout>=2.0.0  # For test timeouts
 
 # Development Tools
-black>=24.1.1  # Code formatting
+black>=24.0.0  # Code formatting
 flake8>=7.0.0  # Code linting
+mypy>=1.8.0  # Type checking
+isort>=5.13.0  # Import sorting
+pre-commit>=3.6.0  # Git hooks
+
+# Documentation
+sphinx>=7.0.0
+sphinx-rtd-theme>=2.0.0
+sphinx-autodoc-typehints>=1.24.0
+
+# Debug Tools
+debugpy>=1.8.0  # VSCode debugging
+ipython>=8.21.0  # Enhanced REPL

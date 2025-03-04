@@ -22,10 +22,12 @@ def test_app_initialization(qapp):
     """Test if QApplication initializes correctly"""
     assert QApplication.instance() is not None
 
+@pytest.mark.gui
 def test_main_window_title(main_window):
     """Test if main window has correct title"""
     assert main_window.windowTitle() == "Main Window"  # Changed from "Stepper Motor Control"
 
+@pytest.mark.hardware
 def test_serial_connection(main_window, qtbot):
     """Test serial connection functionality"""
     with qtbot.waitSignal(main_window.connection_status_changed, timeout=1000):
