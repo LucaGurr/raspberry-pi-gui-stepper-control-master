@@ -1,8 +1,17 @@
 import pytest
-from unittest.mock import patch
-from mock_hardware import MockSerialConnection, MockI2CDevice
-from PyQt5.QtWidgets import QApplication
-from src.gui.main_window import MainWindow
+from unittest.mock import patch, MagicMock
+
+# Mock Adafruit dependencies before importing our modules
+adafruit_mock = MagicMock()
+board_mock = MagicMock()
+
+with patch.dict('sys.modules', {
+    'adafruit_motorkit': adafruit_mock,
+    'board': board_mock,
+    'adafruit_motor': MagicMock()
+}):
+    from mock_hardware import MockSerialConnection, MockI2CDevice
+    from src.gui.main_window import MainWindow
 
 # Create a single QApplication instance for all tests
 @pytest.fixture(scope='session')
@@ -23,10 +32,9 @@ def mock_i2c():
 @pytest.fixture
 def main_window(qapp, mock_serial, mock_i2c, qtbot):
     with patch('src.utils.serial_connection.SerialConnection', return_value=mock_serial):
-        with patch('src.i2c.I2CDevice', return_value=mock_i2c):
-            window = MainWindow()
-            qtbot.addWidget(window)
-            return window
+        window = MainWindow()
+        qtbot.add_widget(window)
+        return window
 
 def test_serial_connection(mock_serial):
     assert not mock_serial.is_connected
