@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget,
                             QScrollArea)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QColor
+import sys
 from utils.serial_connection import SerialConnection
 from gui.motor_control import MotorControl
 
@@ -113,9 +114,7 @@ class MainWindow(QMainWindow):
 
     def run_i2c_test(self):
         """Test I2C communication"""
-        import platform
-        
-        if platform.system() == 'Windows':
+        if sys.platform.startswith('win'):
             return "I2C testing is only available on Linux/Raspberry Pi systems"
             
         try:
