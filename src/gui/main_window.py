@@ -113,6 +113,11 @@ class MainWindow(QMainWindow):
 
     def run_i2c_test(self):
         """Test I2C communication"""
+        import platform
+        
+        if platform.system() == 'Windows':
+            return "I2C testing is only available on Linux/Raspberry Pi systems"
+            
         try:
             try:
                 from smbus2 import SMBus
