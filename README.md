@@ -246,6 +246,54 @@ python src/app.py
    - Enter degrees
    - Click "Rotate Motor"
 
+### Testing and Debugging
+
+#### Platform-Specific Behavior
+
+1. **Windows:**
+   ```python
+   # I2C tests will show:
+   "I2C testing is only available on Linux/Raspberry Pi systems"
+   ```
+
+2. **Linux/Raspberry Pi:**
+   ```python
+   # I2C tests will attempt hardware connection:
+   "I2C communication successful"  # or appropriate error message
+   ```
+
+#### Running the Application
+
+1. **From source directory:**
+   ```bash
+   # Windows
+   cd src
+   python app.py
+
+   # Linux/Raspberry Pi
+   cd src
+   python3 app.py
+   ```
+
+2. **Test Interface:**
+   - Connect button: Establishes hardware connection
+   - Test dropdown: Select test type
+     - Hardware Test
+     - Motor Rotation Test
+     - Serial Connection Test
+     - I2C Communication Test
+   - Run Test button: Executes selected test
+   
+3. **Expected Output:**
+   ```text
+   Hardware Test → Tests basic connectivity
+   Motor Rotation Test → Tests motor commands
+   Serial Connection Test → Tests serial port
+   I2C Communication Test → Tests I2C bus (Pi only)
+   ```
+
+The application will automatically detect the platform and adjust functionality accordingly.
+
 ## Development
 
 ### Testing Framework
