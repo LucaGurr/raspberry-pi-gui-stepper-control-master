@@ -231,6 +231,56 @@ sudo raspi-config
 i2cdetect -y 1
 ```
 
+### Docker Build Instructions
+
+#### Prerequisites
+- Docker installed
+- X11 server running (on Windows, use VcXsrv or Xming)
+
+#### Building and Running
+
+1. **Build the Docker image:**
+```bash
+docker-compose build
+```
+
+2. **On Windows, setup X11:**
+```batch
+# Start VcXsrv with these settings:
+# - Display number: 0
+# - Start no client
+# - Disable access control
+set DISPLAY=host.docker.internal:0
+```
+
+3. **Run the application:**
+```bash
+docker-compose up
+```
+
+#### Development with Docker
+
+1. **Build with development dependencies:**
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml build
+```
+
+2. **Run tests in container:**
+```bash
+docker-compose run --rm stepper-control python -m pytest
+```
+
+#### Troubleshooting Docker
+
+- **X11 Display Issues:**
+  ```bash
+  xhost +local:docker
+  ```
+- **Permission Issues:**
+  ```bash
+  sudo usermod -aG docker $USER
+  ```
+
 ## Usage
 
 1. Run the application:
