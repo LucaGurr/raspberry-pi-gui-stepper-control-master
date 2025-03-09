@@ -8,5 +8,5 @@ def is_linux():
 
 def get_serial_port():
     if is_windows():
-        return 'COM3'  # Default Windows port, may need adjustment
-    return '/dev/ttyUSB0'  # Default Linux/Raspberry Pi port
+        return 'COM3'  # Default Windows port
+    return '/dev/ttyACM0'  # Default Linux/Raspberry Pi port for USB connection

@@ -2,7 +2,7 @@ import os
 
 def get_serial_port():
     """Return the default serial port for Linux."""
-    return '/dev/ttyUSB0'
+    return '/dev/ttyACM0'
 
 def check_dependencies():
     """Check if required dependencies are installed for Linux."""
