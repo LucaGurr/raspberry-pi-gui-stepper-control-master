@@ -11,6 +11,7 @@ platformdirs>=4.0.0
 # Hardware Communication
 adafruit-platformdetect>=3.77.0
 smbus2>=0.4.2  # For I2C communication
+paramiko>=2.11.0
 
 # Testing Dependencies
 pytest>=8.0.0

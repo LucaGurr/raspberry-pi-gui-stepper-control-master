@@ -7,8 +7,24 @@ services:
     devices:
       - "/dev/i2c-1:/dev/i2c-1"  # I2C bus
       - "/dev/ttyACM0:/dev/ttyACM0"  # Serial port for Arduino-style devices
+    networks:
+      rndis_net:
+        ipv4_address: 192.168.7.1  # Host address
     environment:
       - DISPLAY=${DISPLAY}
+      - PLATFORM=${PLATFORM:-linux}
+      - PI_ADDRESS=192.168.7.2     # Raspberry Pi address
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix  # X11 forwarding
+      - ./src:/app/src             # Mount source code
+    extra_hosts:
+      - "raspberrypi:192.168.7.2"  # Add Pi to hosts file
     network_mode: "host"  # Needed for display
+
+networks:
+  rndis_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.7.0/24
+          gateway: 192.168.7.1

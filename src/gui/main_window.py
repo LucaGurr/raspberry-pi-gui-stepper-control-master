@@ -1,9 +1,10 @@
 from PyQt5.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QWidget, 
                             QPushButton, QComboBox, QLineEdit, QHBoxLayout, 
-                            QScrollArea)
+                            QScrollArea, QInputDialog)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPalette, QColor
 import sys
+import paramiko
 from utils.serial_connection import SerialConnection
 from gui.motor_control import MotorControl
 
@@ -25,6 +26,17 @@ class MainWindow(QMainWindow):
         # Create connection control group
         connection_layout = QHBoxLayout()
         
+        # SSH IP input
+        self.ssh_ip_input = QLineEdit()
+        self.ssh_ip_input.setPlaceholderText("Enter SSH IP")
+        connection_layout.addWidget(self.ssh_ip_input)
+
+        # SSH Password input
+        self.ssh_password_input = QLineEdit()
+        self.ssh_password_input.setPlaceholderText("Enter SSH Password")
+        self.ssh_password_input.setEchoMode(QLineEdit.Password)
+        connection_layout.addWidget(self.ssh_password_input)
+
         # Button to connect to Raspberry Pi Zero
         self.connect_button = QPushButton("Connect to PI Zero")
         self.connect_button.clicked.connect(self.connect_to_pi)
@@ -138,10 +150,21 @@ class MainWindow(QMainWindow):
                 bus.close()
 
     def connect_to_pi(self):
-        if self.serial_connection.open_connection():
-            self.debug_info.setText("Connected to PI Zero")
-        else:
-            self.debug_info.setText("Failed to connect to PI Zero")
+        ssh_ip = self.ssh_ip_input.text()
+        ssh_password = self.ssh_password_input.text()
+
+        if not ssh_ip or not ssh_password:
+            self.debug_info.setText("Please enter SSH IP and password.")
+            return
+
+        try:
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(ssh_ip, username='pi', password=ssh_password)
+            self.debug_info.setText("Connected to PI Zero via SSH")
+            ssh.close()
+        except Exception as e:
+            self.debug_info.setText(f"Failed to connect to PI Zero: {str(e)}")
 
     def add_motor_control(self, layout):
         motor_control = MotorControl(self.serial_connection)
