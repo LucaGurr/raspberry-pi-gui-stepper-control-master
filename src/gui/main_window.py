@@ -163,8 +163,12 @@ class MainWindow(QMainWindow):
             ssh.connect(ssh_ip, username='pi', password=ssh_password)
             self.debug_info.setText("Connected to PI Zero via SSH")
             ssh.close()
+        except paramiko.AuthenticationException:
+            self.debug_info.setText("Authentication failed, please verify your credentials.")
+        except paramiko.SSHException as sshException:
+            self.debug_info.setText(f"Unable to establish SSH connection: {str(sshException)}")
         except Exception as e:
-            self.debug_info.setText(f"Failed to connect to PI Zero: {str(e)}")
+            self.debug_info.setText(f"Operation error: {str(e)}")
 
     def add_motor_control(self, layout):
         motor_control = MotorControl(self.serial_connection)

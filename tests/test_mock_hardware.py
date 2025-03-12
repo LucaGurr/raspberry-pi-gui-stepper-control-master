@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from PyQt5.QtWidgets import QApplication
+import paramiko
 
 # Mock Adafruit dependencies before importing our modules
 adafruit_mock = MagicMock()
@@ -78,3 +79,12 @@ def test_main_window_with_mocks(main_window, qtbot_instance):
 def test_main_window_with_mocks(main_window_mock):
     """Test main window with mocked hardware"""
     assert main_window_mock.windowTitle() == "Stepper Motor Control"
+
+def test_ssh_connection(main_window, qtbot_instance):
+    """Test SSH connection setup"""
+    with patch.object(paramiko.SSHClient, 'connect', return_value=None) as mock_connect:
+        main_window.ssh_ip_input.setText("192.168.7.2")
+        main_window.ssh_password_input.setText("raspberry")
+        main_window.connect_button.click()
+        mock_connect.assert_called_once_with("192.168.7.2", username='pi', password='raspberry')
+        assert main_window.debug_info.text() == "Connected to PI Zero via SSH"

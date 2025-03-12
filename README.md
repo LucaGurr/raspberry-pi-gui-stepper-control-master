@@ -326,7 +326,9 @@ python src/app.py
    ```
 
 2. **Test Interface:**
-   - Connect button: Establishes hardware connection
+   - SSH IP input: Enter the IP address of the Raspberry Pi
+   - SSH Password input: Enter the SSH password for the Raspberry Pi
+   - Connect button: Establishes SSH connection to the Raspberry Pi
    - Test dropdown: Select test type
      - Hardware Test
      - Motor Rotation Test
@@ -363,7 +365,7 @@ tests/
 ```python
 # Serial Connection Mock
 class MockSerialConnection:
-    def __init__(self, port='COM3', baudrate=9600):
+    def __init__(, port='COM3', baudrate=9600):
         self.is_connected = False
         self.mock_responses = {
             'motor0 rotate cw 90 degrees': 'OK',
@@ -372,7 +374,7 @@ class MockSerialConnection:
 
 # I2C Device Mock
 class MockI2CDevice:
-    def __init__(self, address):
+    def __init__(, address):
         self.position = 0
         self.direction = 'cw'
 ```
